@@ -7,7 +7,7 @@ import Iter "mo:base/Iter";
 import Text "mo:base/Text";
 import Nat "mo:base/Nat";
 import Nat32 "mo:base/Nat32";
-import Option "mo:base/Option";
+import P "mo:base/Prelude";
 
 module {
   type HashMap<K, V> = HashMap.HashMap<K, V>;
@@ -48,12 +48,18 @@ module {
     let p = Iter.toArray(Iter.map(Text.toIter(t), func (x: Char) : Nat { Nat32.toNat(Char.toNat32(x)) }));
     var res : [var Nat8] = [var];
     for (i in Iter.range(0, 31)) {
-        let a = Option.unwrap(map.get(p[i*2]));
-        let b = Option.unwrap(map.get(p[i*2 + 1]));
+        let a = _unwrap(map.get(p[i*2]));
+        let b = _unwrap(map.get(p[i*2 + 1]));
         let c = 16*a + b;
         res := Array.thaw(Array.append(Array.freeze(res), Array.make(c)));
     };
     let result = Array.freeze(res);
     return result;
   };
+
+  private func _unwrap<T>(x : ?T) : T =
+    switch x {
+      case null { P.unreachable() };
+      case (?x_) { x_ };
+    };
 };
